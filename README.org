@@ -1,0 +1,11 @@
+* rtf-reader
+
+** using with quicklisp
+#+BEGIN_EXAMPLE
+(push #p"~/Programming/Lisp/rtf-reader/" asdf:*central-registry*)
+(ql:quickload :rtf-reader)
+#+END_EXAMPLE
+
+** documentation
+
+https://scymtym.github.io/esrap/
