@@ -23,6 +23,8 @@
                                       (declare (ignore start end))
                                       (parse-integer (format nil "~{~A~}" list)))))
 
+(defrule alphabetic (+ (or (+ #\Space) (character-ranges (#\A #\z)))) (:text T))
+
 (defrule new-line #\Newline)
 
 (defrule oper (or #\+ #\-))
