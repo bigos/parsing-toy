@@ -1,7 +1,6 @@
 ;;;; rtf-reader.lisp
-;; http://nikodemus.github.io/esrap/
+
 ;; https://scymtym.github.io/esrap/
-;; https://quickref.common-lisp.net/esrap.html
 
 (in-package #:rtf-reader)
 
@@ -22,17 +21,20 @@
                          :transform (lambda (list start end)
                                       (declare (ignore start end))
                                       (parse-integer (format nil "~{~A~}" list)))))
+;;; ==============================================================
+(defrule letter-sequence (+ (character-ranges (#\a #\z))))
+(defrule control-word (and #\\ letter-sequence delimiter))
+
+;;; ==============================================================
+
+(defrule anything (+ (not #\Backspace))) ; we do not expect backspace, but what is the proper way of doing anything?
 
 (defrule alphabetic (+ (or (+ #\Space) (character-ranges (#\A #\z)))) (:text T))
 
-(defrule new-line #\Newline)
-
 (defrule oper (or #\+ #\-))
 
-(defrule optspace (* " ") (:constant nil))
-
 ;;; here we ignore optspace and produce only the operator
-(defrule operator (and optspace oper optspace) (:lambda (l) (elt l 1)))
+(defrule operator (and (* #\Space) oper (* #\Space)) (:lambda (l) (elt l 1)))
 
 (defrule curly (and #\{ decimal operator decimal #\}))
 
