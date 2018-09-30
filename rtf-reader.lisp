@@ -14,6 +14,13 @@
            until (eq l 'eof)
            collect l))))
 
+(defun not-doublequote (char)
+  (not (eql #\" char)))
+
+(defun not-integer (string)
+  (when (find-if-not #'digit-char-p string)
+    t))
+
 (defrule opcb "{")
 (defrule clcb "}")
 
@@ -32,7 +39,7 @@
     (declare (ignore p1 p2 w))
     (cons car cdr)))
 
-(defrule atom (or string integer symbol))
+(defrule atom (or string integer symbol #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\,))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
