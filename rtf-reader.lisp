@@ -14,40 +14,38 @@
            until (eq l 'eof)
            collect l))))
 
-;;; useful for conclusion of developed rules
-;;; we do not expect backspace
-(defrule anything (+ (not #\Backspace)) (:lambda (l) (list :anything l)))
+(defrule opcb "{")
+(defrule clcb "}")
 
-(defrule decimal
-    (+ (or "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"))
+(defrule whitespace (+ (or #\space #\tab #\newline))
+  (:constant nil))
+
+(defrule alphanumeric (alphanumericp character))
+
+(defrule sexp (and (? whitespace) (or list atom))
+  (:destructure (w s )
+    (declare (ignore w))
+    s))
+
+(defrule list (and opcb sexp (* sexp) (? whitespace) clcb)
+  (:destructure (p1 car cdr w p2)
+    (declare (ignore p1 p2 w))
+    (cons car cdr)))
+
+(defrule atom (or string integer symbol))
+
+(defrule string (and #\" (* string-char) #\")
+  (:destructure (q1 string q2)
+    (declare (ignore q1 q2))
+    (text string)))
+
+(defrule integer (+ (or "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"))
   (:lambda (list)
-    (parse-integer (format nil "~{~A~}" list))))
+    (parse-integer (text list) :radix 10)))
 
-;;; ==============================================================
-
-(defrule opcurly "{")
-(defrule clcurly "}")
-
-;; (parse 'tocurly "12345}")
-(defrule tocurly  (and decimal (& clcurly) clcurly) (:destructure (tx nb rb) (declare (ignore nb rb)) tx))
-
-(defrule letter (character-ranges (#\a #\z) (#\A #\Z)))
-(defrule letter-sequence (+ (character-ranges (#\a #\z))))
-(defrule control-word (and #\\ letter-sequence delimiter anything))
-(defrule delimiter (or #\Space decimal-delimiter (or (! letter) (! decimal)) ))
-(defrule decimal-delimiter (and (? "-") decimal))
-;;; ==============================================================
-(parse 'control-word "\\c123ala ma kota456")
-
-
-
-(defrule alphabetic (+ (or (+ #\Space) (character-ranges (#\A #\z)))) (:text T))
-
-(defrule oper (or #\+ #\-))
-
-;;; here we ignore optspace and produce only the operator
-(defrule operator (and (* #\Space) oper (* #\Space)) (:lambda (l) (elt l 1)))
-
-(defrule curly (and #\{ decimal operator decimal #\}))
-
-(parse 'curly "{123   -  4}")
+(defrule symbol (not-integer (+ alphanumeric))
+  ;; NOT-INTEGER is not strictly needed because ATOM considers INTEGER before
+  ;; a STRING, we know can accept all sequences of alphanumerics -- we already
+  ;; know it isn't an integer.
+  (:lambda (list)
+    (intern (text list))))
