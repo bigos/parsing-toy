@@ -6,13 +6,17 @@
 
 (defparameter rtf-file #P"~/rj.rtf")
 
-(defun read-file ()
+(defun read-doc ()
   (with-open-file (s rtf-file)
     (car
      (loop for l = (read-line s nil 'eof)
              then (read-line s nil 'eof)
            until (eq l 'eof)
            collect l))))
+
+;;; useful for conclusion of developed rules
+;;; we do not expect backspace
+(defrule anything (+ (not #\Backspace)) (:lambda (l) (list :anything l)))
 
 ;; Rules can transform their matches.
 (add-rule 'decimal
@@ -22,6 +26,12 @@
                                       (declare (ignore start end))
                                       (parse-integer (format nil "~{~A~}" list)))))
 ;;; ==============================================================
+(defrule opcurly "{")
+(defrule clcurly "}")
+
+;; (parse 'tocurly "s}")
+(defrule tocurly  (and "s" (& clcurly) clcurly))
+
 (defrule letter (character-ranges (#\a #\z) (#\A #\Z)))
 (defrule letter-sequence (+ (character-ranges (#\a #\z))))
 (defrule control-word (and #\\ letter-sequence delimiter anything))
@@ -31,9 +41,6 @@
 (parse 'control-word "\\c123ala ma kota456")
 
 
-;;; useful for conclusion of developed rules
-;;; we do not expect backspace
-(defrule anything (+ (not #\Backspace)) (:lambda (l) (list :anything l)))
 
 (defrule alphabetic (+ (or (+ #\Space) (character-ranges (#\A #\z)))) (:text T))
 
