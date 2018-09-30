@@ -18,19 +18,18 @@
 ;;; we do not expect backspace
 (defrule anything (+ (not #\Backspace)) (:lambda (l) (list :anything l)))
 
-;; Rules can transform their matches.
-(add-rule 'decimal
-          (make-instance 'rule
-                         :expression '(+ (or "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"))
-                         :transform (lambda (list start end)
-                                      (declare (ignore start end))
-                                      (parse-integer (format nil "~{~A~}" list)))))
+(defrule decimal
+    (+ (or "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"))
+  (:lambda (list)
+    (parse-integer (format nil "~{~A~}" list))))
+
 ;;; ==============================================================
+
 (defrule opcurly "{")
 (defrule clcurly "}")
 
-;; (parse 'tocurly "s}")
-(defrule tocurly  (and "s" (& clcurly) clcurly))
+;; (parse 'tocurly "12345}")
+(defrule tocurly  (and decimal (& clcurly) clcurly) (:destructure (tx nb rb) (declare (ignore nb rb)) tx))
 
 (defrule letter (character-ranges (#\a #\z) (#\A #\Z)))
 (defrule letter-sequence (+ (character-ranges (#\a #\z))))
