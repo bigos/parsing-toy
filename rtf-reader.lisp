@@ -30,7 +30,7 @@
 (defrule utfic (and "\\" "u" integer "?")
   (:destructure (bs u nn qm)
     (declare (ignore bs u qm))
-    (list :utf (format nil "~x"  nn))))
+     (format nil "~x" (code-char nn))))
 
 (defrule alphanumeric (alphanumericp character))
 
