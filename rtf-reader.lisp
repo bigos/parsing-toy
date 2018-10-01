@@ -27,6 +27,10 @@
 (defrule whitespace (+ (or #\space #\tab #\newline))
   (:constant nil))
 
+(defrule utfic (and "\\" "u" integer "?")
+  (:destructure (bs u nn qm)
+    (declare (ignore bs u qm))
+   (list :utf nn)))
 (defrule alphanumeric (alphanumericp character))
 
 (defrule sexp (and (? whitespace) (or list atom))
@@ -39,7 +43,7 @@
     (declare (ignore p1 p2 w))
     (cons car cdr)))
 
-(defrule atom (or string integer symbol #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\,))
+(defrule atom (or string integer symbol utfic #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\,))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
