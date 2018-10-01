@@ -30,7 +30,8 @@
 (defrule utfic (and "\\" "u" integer "?")
   (:destructure (bs u nn qm)
     (declare (ignore bs u qm))
-   (list :utf nn)))
+    (list :utf (format nil "~x"  nn))))
+
 (defrule alphanumeric (alphanumericp character))
 
 (defrule sexp (and (? whitespace) (or list atom))
