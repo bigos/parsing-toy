@@ -44,7 +44,8 @@
     (declare (ignore p1 p2 w))
     (cons car cdr)))
 
-(defrule atom (or string integer symbol utfic #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\,))
+(defrule atom (or string integer symbol
+                  utfic #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\, #\- #\[ #\] #\!))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
