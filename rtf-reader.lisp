@@ -34,6 +34,8 @@
 
 (defrule alphanumeric (alphanumericp character))
 
+;; (alexandria:flatten (parse 'sexp (read-doc)))
+
 (defrule sexp (and (? whitespace) (or list atom))
   (:destructure (w s )
     (declare (ignore w))
