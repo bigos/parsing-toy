@@ -24,8 +24,8 @@
 (defrule opcb "{")
 (defrule clcb "}")
 
-(defrule whitespace (+ (or #\space #\tab #\newline))
-  (:constant nil))
+(defrule whitespace (+ (or #\tab #\newline))
+  (:constant " -  "))
 
 (defrule utfic (and "\\" "u" integer "?")
   (:destructure (bs u nn qm)
@@ -45,7 +45,7 @@
     (cons car cdr)))
 
 (defrule atom (or string integer symbol
-                  utfic #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\, #\- #\[ #\] #\!))
+                  utfic #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\, #\- #\[ #\] #\! #\Space))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
