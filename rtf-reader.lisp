@@ -4,10 +4,8 @@
 
 (in-package #:rtf-reader)
 
-(defparameter rtf-file #P"~/rj.rtf")
-
-(defun read-doc ()
-  (with-open-file (s rtf-file)
+(defun read-doc (file)
+  (with-open-file (s file)
     (car
      (loop for l = (read-line s nil 'eof)
              then (read-line s nil 'eof)
@@ -71,7 +69,8 @@
   (:lambda (list)
     (intern (text list))))
 
-(defun main ()
+;; (main #P "~/rj.rtf")
+(defun main (file)
   (remove-if (lambda (x) (or (symbolp x)
                              (equal x  "\\")))
-             (alexandria::flatten (parse 'sexp (read-doc)))))
+             (alexandria::flatten (parse 'sexp (read-doc file)))))
