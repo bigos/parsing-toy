@@ -54,7 +54,9 @@
     (cons car cdr)))
 
 (defrule atom (or string integer symbol utfstr  #\\ #\* #\; #\? #\' #\.
-                  #\( #\) #\: #\, #\! #\-))
+                  #\( #\) #\: #\, #\! #\- #\[ #\] #\/
+                  #\> #\<
+                  #\|))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
@@ -83,12 +85,14 @@
              (alexandria::flatten (parse 'sexp (read-doc file)))))
 
 (defun main ()
-  (let ((hash (make-hash-table :test #'equalp)))
-    (loop for wr in
-                 (downcase-words
-                  (words-in-file (elt (cl-fad:list-directory #p "/tmp/rus/")
-                                      2)))
-          do (incf (gethash wr hash 0)))
+  (let ((all-files (cl-fad:list-directory #p "/tmp/rus/"))
+        (hash (make-hash-table :test #'equalp)))
+    (loop for fn from 0 below (length all-files)
+          do (loop for wr in
+                          (downcase-words
+                           (words-in-file (elt all-files
+                                               fn)))
+                   do (incf (gethash wr hash 0))))
     (sort
      (loop for k being each hash-key of hash collect (list k (gethash k hash 0 )))
-    #'< :key #'cadr )))
+     #'< :key #'cadr )))
