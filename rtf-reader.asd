@@ -6,6 +6,6 @@
   :license  "Specify license here"
   :version "0.0.1"
   :serial t
-  :depends-on (#:esrap #:alexandria #:cl-fad)
+  :depends-on (#:esrap #:alexandria #:cl-fad #:cl-ppcre)
   :components ((:file "package")
                (:file "rtf-reader")))
