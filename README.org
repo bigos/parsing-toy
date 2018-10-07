@@ -13,3 +13,13 @@ https://scymtym.github.io/esrap/
 http://www.biblioscape.com/rtf15_spec.htm
 
 https://github.com/nikodemus/esrap/blob/master/example-symbol-table.lisp
+
+** decompressing some files
+#+BEGIN_EXAMPLE
+$ cp ./rus.tar /tmp
+$ cd /tmp
+$ tar -xvf ./rus.tar
+$ cd ./rus
+$ unzip  \*.zip
+$ rm *.zip
+#+END_EXAMPLE
