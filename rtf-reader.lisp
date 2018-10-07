@@ -83,6 +83,12 @@
              (alexandria::flatten (parse 'sexp (read-doc file)))))
 
 (defun main ()
-  (downcase-words
-   (words-in-file (elt (cl-fad:list-directory #p "/tmp/rus/")
-                       2))))
+  (let ((hash (make-hash-table :test #'equalp)))
+    (loop for wr in
+                 (downcase-words
+                  (words-in-file (elt (cl-fad:list-directory #p "/tmp/rus/")
+                                      2)))
+          do (incf (gethash wr hash 0)))
+    (sort
+     (loop for k being each hash-key of hash collect (list k (gethash k hash 0 )))
+    #'< :key #'cadr )))
