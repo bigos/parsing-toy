@@ -72,11 +72,17 @@
   (:lambda (list)
     (intern (text list))))
 
+(defun downcase-words (wl)
+  (loop for w in wl collect (if (typep w 'string)
+                                (string-downcase w)
+                                w)))
+
 (defun words-in-file (file)
   (remove-if (lambda (x) (or (symbolp x)
                              (equal x  "\\")))
              (alexandria::flatten (parse 'sexp (read-doc file)))))
 
 (defun main ()
-  (words-in-file (elt (cl-fad:list-directory #p "/tmp/rus/")
-                      2)))
+  (downcase-words
+   (words-in-file (elt (cl-fad:list-directory #p "/tmp/rus/")
+                       2))))
