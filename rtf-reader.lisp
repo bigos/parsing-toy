@@ -6,8 +6,8 @@
 
 (defparameter rtf-file #P"~/rj.rtf")
 
-(defun read-doc ()
-  (with-open-file (s rtf-file)
+(defun read-doc (file)
+  (with-open-file (s file)
     (car
      (loop for l = (read-line s nil 'eof)
              then (read-line s nil 'eof)
@@ -71,7 +71,10 @@
   (:lambda (list)
     (intern (text list))))
 
-(defun main ()
+(defun words-in-file (file)
   (remove-if (lambda (x) (or (symbolp x)
                              (equal x  "\\")))
-             (alexandria::flatten (parse 'sexp (read-doc)))))
+             (alexandria::flatten (parse 'sexp (read-doc file)))))
+
+(defun main ()
+  (words-in-file (car (cl-fad:list-directory #p "/tmp/rus/"))))
