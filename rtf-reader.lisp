@@ -30,11 +30,11 @@
 (defrule utfseq (and "\\" "u" integer "?")
   (:destructure (bs uc int qm)
     (declare (ignore bs uc qm))
-    (format nil "~A" (code-char int))))
+    (format nil "~A" (code-char (if (eq int (char-code #\no-break_space)) 32 int)))))
 
 (defrule utfstr (+ utfseq)
   (:lambda (lst)
-    (text lst)))
+     (cl-ppcre:split "\\s+"  (text lst))))
 
 (defrule utfic (and "\\" "u" integer "?")
   (:destructure (bs u nn qm)
@@ -53,7 +53,8 @@
     (declare (ignore p1 p2 w))
     (cons car cdr)))
 
-(defrule atom (or string integer symbol utfstr  #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\,))
+(defrule atom (or string integer symbol utfstr  #\\ #\* #\; #\? #\' #\.
+                  #\( #\) #\: #\, #\! #\-))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
@@ -77,4 +78,5 @@
              (alexandria::flatten (parse 'sexp (read-doc file)))))
 
 (defun main ()
-  (words-in-file (car (cl-fad:list-directory #p "/tmp/rus/"))))
+  (words-in-file (elt (cl-fad:list-directory #p "/tmp/rus/")
+                      2)))
