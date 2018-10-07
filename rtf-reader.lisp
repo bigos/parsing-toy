@@ -6,8 +6,8 @@
 
 (defparameter rtf-file #P"~/rj.rtf")
 
-(defun read-doc ()
-  (with-open-file (s rtf-file)
+(defun read-doc (file)
+  (with-open-file (s file)
     (car
      (loop for l = (read-line s nil 'eof)
              then (read-line s nil 'eof)
@@ -24,19 +24,26 @@
 (defrule opcb "{")
 (defrule clcb "}")
 
-(defrule whitespace (+ (or #\tab #\newline))
-  (:constant " -  "))
+(defrule whitespace (+ (or #\space #\tab #\newline))
+  (:constant nil))
+
+(defrule utfseq (and "\\" "u" integer "?")
+  (:destructure (bs uc int qm)
+    (declare (ignore bs uc qm))
+    (format nil "~A" (code-char int))))
+
+(defrule utfstr (+ utfseq)
+  (:lambda (lst)
+    (text lst)))
 
 (defrule utfic (and "\\" "u" integer "?")
   (:destructure (bs u nn qm)
     (declare (ignore bs u qm))
-     (format nil "~x" (code-char nn))))
+    (list :utf (format nil "~x"  nn))))
 
 (defrule alphanumeric (alphanumericp character))
 
-;; (alexandria:flatten (parse 'sexp (read-doc)))
-
-(defrule sexp (and (? whitespace) (or list atom))
+(defrule sexp (and (? whitespace) (or list atom ))
   (:destructure (w s )
     (declare (ignore w))
     s))
@@ -46,8 +53,7 @@
     (declare (ignore p1 p2 w))
     (cons car cdr)))
 
-(defrule atom (or string integer symbol
-                  utfic #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\, #\- #\[ #\] #\! #\Space))
+(defrule atom (or string integer symbol utfstr  #\\ #\* #\; #\? #\' #\. #\( #\) #\: #\,))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
@@ -64,3 +70,11 @@
   ;; know it isn't an integer.
   (:lambda (list)
     (intern (text list))))
+
+(defun words-in-file (file)
+  (remove-if (lambda (x) (or (symbolp x)
+                             (equal x  "\\")))
+             (alexandria::flatten (parse 'sexp (read-doc file)))))
+
+(defun main ()
+  (words-in-file (car (cl-fad:list-directory #p "/tmp/rus/"))))
