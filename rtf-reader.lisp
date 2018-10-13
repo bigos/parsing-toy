@@ -55,8 +55,7 @@
 
 (defrule atom (or string integer symbol utfstr  #\\ #\* #\; #\? #\' #\.
                   #\( #\) #\: #\, #\! #\- #\[ #\] #\/
-                  #\> #\<
-                  #\|))
+                  #\> #\< #\|))
 
 (defrule string (and #\" (* string-char) #\")
   (:destructure (q1 string q2)
@@ -80,9 +79,12 @@
                                 w)))
 
 (defun words-in-file (file)
+  (format t "~&reading file ~A~%" file)
   (remove-if (lambda (x) (or (symbolp x)
                              (equal x  "\\")))
              (alexandria::flatten (parse 'sexp (read-doc file)))))
+
+(defparameter *sorted* nil)
 
 (defun main ()
   (let ((all-files (cl-fad:list-directory #p "/tmp/rus/"))
@@ -93,6 +95,11 @@
                            (words-in-file (elt all-files
                                                fn)))
                    do (incf (gethash wr hash 0))))
-    (sort
-     (loop for k being each hash-key of hash collect (list k (gethash k hash 0 )))
-     #'< :key #'cadr )))
+    (setf *sorted* (sort
+                  (loop for k being each hash-key of hash collect (list k (gethash k hash 0 )))
+                  #'> :key #'cadr ))
+    ;; show me first 500 words
+    (subseq *sorted* 0 500)
+    ;; number of word and their forms recorded
+    ;; (length sorted)
+    ))
