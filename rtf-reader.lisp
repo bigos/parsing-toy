@@ -103,3 +103,15 @@
     ;; number of word and their forms recorded
     ;; (length sorted)
     ))
+
+(defun ascii-chars ()
+  (loop for x from 60 to 126 collect (code-char x)))
+
+(defun contains-ascii-p (word)
+  (loop for c across word
+        until (member c (ascii-chars))
+        finally (return (member c (ascii-chars)))))
+
+(defun print-sorted ()
+  (loop for w in *sorted* do
+        (format t "~A - ~A ~%" (car w) (cadr w))))
